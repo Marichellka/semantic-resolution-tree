@@ -20,6 +20,7 @@ namespace Project
                     code += reader.ReadLine();
                 }
             }
+            code.Replace(" ", "");
             ParsingString(code);
         }
 
@@ -81,10 +82,10 @@ namespace Project
             {
                 if (token.Equals('('))
                 {
-                    currentNode.insertLeft(currentNode);
-                    currentNode = currentNode.LeftChild;
+                    currentNode.Insert(currentNode);
+                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
                 }
-                else if (token.GetType() == typeof(double))
+                else if (double.TryParse(token.ToString(), out double n))
                 {
                     currentNode.Key = token;
                     currentNode = currentNode.Parent;
@@ -96,8 +97,8 @@ namespace Project
                 else
                 {
                     currentNode.Key = token;
-                    currentNode.insertRight(null);
-                    currentNode = currentNode.RightChild;
+                    currentNode.Insert(null);
+                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
                 }
             }
         }
