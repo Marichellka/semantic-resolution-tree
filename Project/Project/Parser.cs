@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Project
 {
-    public class Reader
+    public class Parser
     {
         private Tree AST;
         private List<object> tokens;
 
-        public Reader(string path)
+        public Parser(string path)
         {
             string code = "";
             using (StreamReader reader = new StreamReader(path, Encoding.Default))
