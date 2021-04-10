@@ -28,21 +28,43 @@ namespace Project
             tokens = new List<object>();
             for (int i = 0; i < code.Length; i++)
             {
-                if (double.TryParse(code[i].ToString(), out double n))
+                if (Char.IsDigit(code[i]) || code[i]=='.')
                 {
-                    if (tokens[tokens.Count-1].GetType()==typeof(double))
+                    if (i != 0)
                     {
-                        tokens[tokens.Count - 1] = Convert.ToDouble(tokens[tokens.Count - 1].ToString() + code[i]);
+                        string prevToken = tokens[tokens.Count - 1].ToString();
+                        if (double.TryParse(prevToken, out double n))
+                        {
+                            tokens[tokens.Count - 1] = prevToken + code[i];
+                        }
+                        else
+                        {
+                            tokens.Add(code[i]);
+                        }
                     }
                     else
                     {
-                        tokens.Add(n);
+                        tokens.Add(code[i]);
                     }
                 }
-                else if(code[i]=='.')
+                else if(Char.IsLetter(code[i]))
                 {
-                    tokens[tokens.Count - 1] = Convert.ToDouble(tokens[tokens.Count - 1].ToString() + code[i]+code[i+1]);
-                    i++;
+                    if (i != 0)
+                    {
+                        string prevToken = tokens[tokens.Count - 1].ToString();
+                        if (Char.IsLetter(prevToken[prevToken.Length - 1]))
+                        {
+                            tokens[tokens.Count - 1] = prevToken + code[i];
+                        }
+                        else
+                        {
+                            tokens.Add(code[i]);
+                        }
+                    }
+                    else
+                    {
+                        tokens.Add(code[i]);
+                    }
                 }
                 else
                 {
