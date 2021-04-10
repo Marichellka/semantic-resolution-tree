@@ -2,23 +2,25 @@
 {
     public class Tree
     {
-        public object Parent { get; private set; }
+        public Tree Parent { get; private set; }
+        public Tree Node{get; private set;}
         public object Key { get; set; }
-        public object LeftChild { get; private set; }
-        public object RightChild { get; private set; }
-        
+        public Tree LeftChild { get; private set; }
+        public Tree RightChild { get; private set; }
+
         public Tree(object value)
         {
             Key = value;
             LeftChild = null;
             RightChild = null;
             Parent = null;
+            Node = this;
         }
 
         public void insertLeft(object value)
         {
             Tree newNode = new Tree(value);
-            newNode.Parent = this.Key;
+            newNode.Parent = Node;
             if(LeftChild==null)
                 this.LeftChild = newNode;
             else
@@ -31,7 +33,7 @@
         public void insertRight(object value)
         {
             Tree newNode = new Tree(value);
-            newNode.Parent = this.Key;
+            newNode.Parent = Node;
             if(RightChild==null)
                 this.RightChild = newNode;
             else
