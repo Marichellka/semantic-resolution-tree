@@ -20,7 +20,6 @@ namespace Project
                     code += reader.ReadLine();
                 }
             }
-            code.Replace(" ", "");
             ParsingString(code);
         }
 
@@ -29,6 +28,7 @@ namespace Project
             tokens = new List<object>();
             for (int i = 0; i < code.Length; i++)
             {
+                if(code[i]==' ')continue;
                 if (Char.IsDigit(code[i]) || code[i]=='.')
                 {
                     if (i != 0)
@@ -78,6 +78,8 @@ namespace Project
         {
             AST = new Tree(null);
             Tree currentNode = AST;
+            currentNode.Insert(null);
+            currentNode = currentNode.Childs[0];
             foreach (var token in tokens)
             {
                 if (token.Equals('('))
@@ -85,7 +87,7 @@ namespace Project
                     currentNode.Insert(currentNode);
                     currentNode = currentNode.Childs[currentNode.Childs.Count-1];
                 }
-                else if (double.TryParse(token.ToString(), out double n))
+                else if (double.TryParse(token.ToString(), out double n) || Char.IsLetter(token.ToString()[0]))
                 {
                     currentNode.Key = token;
                     currentNode = currentNode.Parent;
@@ -96,8 +98,8 @@ namespace Project
                 }
                 else
                 {
+                    currentNode.Insert(currentNode.Key);
                     currentNode.Key = token;
-                    currentNode.Insert(null);
                     currentNode = currentNode.Childs[currentNode.Childs.Count-1];
                 }
             }
