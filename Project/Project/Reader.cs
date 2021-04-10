@@ -48,5 +48,34 @@ namespace Project
             }
             return tokens;
         }
+        
+        private void BuildTree(List<object> tokens)
+        {
+            AST = new Tree(null);
+            object currentNode = AST;
+            foreach (var token in tokens)
+            {
+                if (token.Equals('('))
+                {
+                    AST.insertLeft(currentNode);
+                    currentNode = AST.LeftChild;
+                }
+                else if (token.GetType() == typeof(double))
+                {
+                    AST.Key = token;
+                    currentNode = AST.Parent;
+                }
+                else if (token.Equals(')'))
+                {
+                    currentNode = AST.Parent;
+                }
+                else
+                {
+                    AST.Key = token;
+                    AST.insertRight(null);
+                    currentNode = AST.RightChild;
+                }
+            }
+        }
     }
 }
