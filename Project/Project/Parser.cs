@@ -8,7 +8,7 @@ namespace Project
     public class Parser
     {
         private Tree AST;
-        private List<object> tokens;
+        private List<string> tokens;
 
         public Parser(string path)
         {
@@ -18,59 +18,83 @@ namespace Project
                 while (!reader.EndOfStream)
                 {
                     code += reader.ReadLine();
+                    PolishNotation(code);
                 }
             }
-            ParsingString(code);
         }
 
-        private void ParsingString(string code)
+        private int GetPriority(char oper)
         {
-            tokens = new List<object>();
+            switch (oper)
+            {
+                case '(':
+                    return 0;
+                case ')':
+                    return 1;
+                case '+':
+                    return 2;
+                case '-':
+                    return 2;
+                case '*':
+                    return 3;
+                case '/':
+                    return 3;
+                case '=':
+                    return -1;
+            }
+
+            return 0;
+        }
+        
+        public void PolishNotation(string code)
+        {
+            tokens = new List<string>();
+            Stack<char> stack = new Stack<char>();
             for (int i = 0; i < code.Length; i++)
             {
-                if(code[i]==' ')continue;
-                if (Char.IsDigit(code[i]) || code[i]=='.')
+                if (code[i] == ')')
                 {
-                    if (i != 0)
+                    while (stack.Peek()!='(')
                     {
-                        string prevToken = tokens[tokens.Count - 1].ToString();
-                        if (double.TryParse(prevToken, out double n))
-                        {
-                            tokens[tokens.Count - 1] = prevToken + code[i];
-                        }
-                        else
-                        {
-                            tokens.Add(code[i]);
-                        }
+                        tokens.Add(stack.Pop().ToString());
                     }
-                    else
-                    {
-                        tokens.Add(code[i]);
-                    }
+                    stack.Pop();
                 }
-                else if(Char.IsLetter(code[i]))
+                else if (Char.IsLetter(code[i])||Char.IsDigit(code[i]))
                 {
-                    if (i != 0)
+                    string elem = "";
+                    while (i<code.Length && (Char.IsLetter(code[i]) || Char.IsDigit(code[i]) || code[i]=='.'))
                     {
-                        string prevToken = tokens[tokens.Count - 1].ToString();
-                        if (Char.IsLetter(prevToken[prevToken.Length - 1]))
-                        {
-                            tokens[tokens.Count - 1] = prevToken + code[i];
-                        }
-                        else
-                        {
-                            tokens.Add(code[i]);
-                        }
+                        
+                        elem += code[i];
+                        i++;
                     }
-                    else
-                    {
-                        tokens.Add(code[i]);
-                    }
+
+                    i--;
+                    tokens.Add(elem);
                 }
-                else
+                else if (code[i] == '('||code[i]=='=')
                 {
-                    tokens.Add(code[i]);
+                    stack.Push(code[i]);
                 }
+                else if(code[i]=='+'||code[i]=='-'||code[i]=='/'||code[i]=='*')
+                {
+                    if(stack.Count==0)
+                        stack.Push(code[i]);
+                    else if(GetPriority(stack.Peek())<GetPriority(code[i]))      
+                        stack.Push(code[i]);
+                    else                              
+                    {
+                        while(stack.Count!=0 && GetPriority(stack.Peek())>=GetPriority(code[i]))
+                            tokens.Add(stack.Pop().ToString());
+                        
+                        stack.Push(code[i]);           
+                    } 
+                }
+            }
+            foreach (var elem in stack)
+            {
+                tokens.Add(elem.ToString());
             }
         }
 
@@ -80,27 +104,32 @@ namespace Project
             Tree currentNode = AST;
             currentNode.Insert(null);
             currentNode = currentNode.Childs[0];
-            foreach (var token in tokens)
+            for(int i=tokens.Count-1; i>=0; i--)
             {
-                if (token.Equals('('))
+                if (double.TryParse(tokens[i], out double n) || Char.IsLetter(tokens[i][0]))
                 {
-                    currentNode.Insert(currentNode);
-                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
-                }
-                else if (double.TryParse(token.ToString(), out double n) || Char.IsLetter(token.ToString()[0]))
-                {
-                    currentNode.Key = token;
-                    currentNode = currentNode.Parent;
-                }
-                else if (token.Equals(')'))
-                {
-                    currentNode = currentNode.Parent;
+                    if (currentNode.Childs.Count <  2)
+                    {
+                        currentNode.Insert(tokens[i]);
+                    }
+                    else
+                    {
+                        currentNode = currentNode.Parent;
+                        while (currentNode.Childs.Count==2)
+                        {
+                            currentNode = currentNode.Parent;
+                        }
+                        currentNode.Insert(tokens[i]);
+                    }
                 }
                 else
                 {
-                    currentNode.Insert(currentNode.Key);
-                    currentNode.Key = token;
-                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
+                    if (currentNode.Key!=null)
+                    {
+                        currentNode.Insert(null);
+                        currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
+                    }
+                    currentNode.Key = tokens[i];
                 }
             }
         }

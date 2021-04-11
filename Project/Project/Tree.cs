@@ -23,5 +23,13 @@ namespace Project
             newNode.Parent = Node;
             Childs.Add(newNode);
         }
+        
+        public void InsertBetween(Tree newNode)
+        {
+            newNode.Parent = this;
+            newNode.Childs.Add(Childs[Childs.Count-1]);
+            Childs.Remove(Childs[Childs.Count-1]);
+            Childs.Add(newNode);
+        }
     }
 }
