@@ -84,8 +84,7 @@ namespace Project
             {
                 if (token.Equals('('))
                 {
-                    currentNode.Insert(currentNode);
-                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
+                    continue;
                 }
                 else if (double.TryParse(token.ToString(), out double n) || Char.IsLetter(token.ToString()[0]))
                 {
@@ -98,9 +97,10 @@ namespace Project
                 }
                 else
                 {
-                    currentNode.Insert(currentNode.Key);
-                    currentNode.Key = token;
-                    currentNode = currentNode.Childs[currentNode.Childs.Count-1];
+                    currentNode.InsertBetween(new Tree(token));
+                    currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
+                    currentNode.Insert(null);
+                    currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
                 }
             }
         }
