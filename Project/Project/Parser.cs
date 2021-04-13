@@ -12,13 +12,15 @@ namespace Project
 
         public Parser(string path)
         {
-            string code = "";
+            AST = new Tree(null);
             using (StreamReader reader = new StreamReader(path, Encoding.Default))
             {
                 while (!reader.EndOfStream)
                 {
-                    code += reader.ReadLine();
+                    string code = reader.ReadLine().Replace(" ", "");
+                    code.Replace("	", "");
                     PolishNotation(code);
+                    AST.Insert(BuildCurrentTree());
                 }
             }
         }
@@ -98,19 +100,17 @@ namespace Project
             }
         }
 
-        public void BuildTree()
+        public Tree BuildCurrentTree()
         {
-            AST = new Tree(null);
-            Tree currentNode = AST;
-            currentNode.Insert(null);
-            currentNode = currentNode.Childs[0];
+            Tree currentTree =new Tree(null);
+            Tree currentNode = currentTree;
             for(int i=tokens.Count-1; i>=0; i--)
             {
-                if (double.TryParse(tokens[i], out double n) || Char.IsLetter(tokens[i][0]))
+                if (double.TryParse(tokens[i], out _) || Char.IsLetter(tokens[i][0]))
                 {
                     if (currentNode.Childs.Count <  2)
                     {
-                        currentNode.Insert(tokens[i]);
+                        currentNode.Insert(new Tree(tokens[i]));
                     }
                     else
                     {
@@ -119,19 +119,20 @@ namespace Project
                         {
                             currentNode = currentNode.Parent;
                         }
-                        currentNode.Insert(tokens[i]);
+                        currentNode.Insert(new Tree(tokens[i]));
                     }
                 }
                 else
                 {
                     if (currentNode.Key!=null)
                     {
-                        currentNode.Insert(null);
+                        currentNode.Insert(new Tree(null));
                         currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
                     }
                     currentNode.Key = tokens[i];
                 }
             }
+            return currentTree;
         }
     }
 }
