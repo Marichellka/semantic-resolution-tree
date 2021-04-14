@@ -36,6 +36,12 @@ namespace Project
                 AST.Insert(new Tree(null));
                 AST = AST.Childs[AST.Childs.Count-1];
             }
+            else if(code=="else")
+            {
+                AST = AST.Parent;
+                AST.Insert(new Tree("else"));
+                AST=AST.Childs[AST.Childs.Count-1];
+            }
             else if (code=="endif")
             {
                 AST = AST.Parent;
