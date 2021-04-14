@@ -17,11 +17,34 @@ namespace Project
             {
                 while (!reader.EndOfStream)
                 {
-                    string code = reader.ReadLine().Replace(" ", "");
-                    code.Replace("	", "");
-                    PolishNotation(code);
-                    AST.Insert(BuildCurrentTree());
+                    ParsingString(reader);
                 }
+            }
+        }
+        
+        private void ParsingString(StreamReader reader)
+        {
+            string code = reader.ReadLine().Replace(" ", "");
+            code.Replace("	", "");
+            tokens = new List<string>();
+            if (code.Length > 4 && code.Contains("if("))
+            {
+                AST.Insert(new Tree("if"));
+                AST = AST.Childs[AST.Childs.Count-1];
+                PolishNotation(code.Substring(code.IndexOf("if")+2));
+                AST.Insert(BuildCurrentTree());
+                AST.Insert(new Tree(null));
+                AST = AST.Childs[AST.Childs.Count-1];
+            }
+            else if (code=="endif")
+            {
+                AST = AST.Parent;
+                AST = AST.Parent;
+            }
+            else
+            {
+                PolishNotation(code);
+                AST.Insert(BuildCurrentTree());
             }
         }
 
@@ -33,22 +56,18 @@ namespace Project
                     return 0;
                 case ')':
                     return 1;
-                case '+':
+                case char when "+-".Contains(oper):
                     return 2;
-                case '-':
-                    return 2;
-                case '*':
+                case char when "*/".Contains(oper):
                     return 3;
-                case '/':
-                    return 3;
-                case '=':
+                case char when "=><!".Contains(oper):
                     return -1;
             }
 
             return 0;
         }
         
-        public void PolishNotation(string code)
+        private void PolishNotation(string code)
         {
             tokens = new List<string>();
             Stack<char> stack = new Stack<char>();
@@ -100,7 +119,7 @@ namespace Project
             }
         }
 
-        public Tree BuildCurrentTree()
+        private Tree BuildCurrentTree()
         {
             Tree currentTree =new Tree(null);
             Tree currentNode = currentTree;
