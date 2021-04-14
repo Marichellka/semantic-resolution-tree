@@ -69,7 +69,6 @@ namespace Project
         
         private void PolishNotation(string code)
         {
-            tokens = new List<string>();
             Stack<char> stack = new Stack<char>();
             for (int i = 0; i < code.Length; i++)
             {
@@ -77,7 +76,14 @@ namespace Project
                 {
                     while (stack.Peek()!='(')
                     {
-                        tokens.Add(stack.Pop().ToString());
+                        if ("=><!".Contains(stack.Peek()) && tokens[tokens.Count - 1] == "=")
+                        {
+                            tokens[tokens.Count - 1] += stack.Pop();
+                        }
+                        else
+                        {
+                            tokens.Add(stack.Pop().ToString());
+                        }
                     }
                     stack.Pop();
                 }
@@ -94,7 +100,7 @@ namespace Project
                     i--;
                     tokens.Add(elem);
                 }
-                else if (code[i] == '('||code[i]=='=')
+                else if ("(!=<>".Contains(code[i]))
                 {
                     stack.Push(code[i]);
                 }
