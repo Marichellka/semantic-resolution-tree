@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections;
-using System;
 
 namespace Project
 {
@@ -24,7 +24,7 @@ namespace Project
                 Tree item = queue.Dequeue();
                 if (item.Key.Contains("="))
                 {
-                    if (!item.Childs[1].Key.Equals("+") || !item.Childs[1].Key.Equals("-") || !item.Childs[1].Key.Equals("*") || !item.Childs[1].Key.Equals("/"))
+                    if (!item.Childs[1].Key.Equals("+") && !item.Childs[1].Key.Equals("-") && !item.Childs[1].Key.Equals("*") && !item.Childs[1].Key.Equals("/"))
                     {
                         ht.Add(item.Childs[0].Key, item.Childs[1].Key);
                     }
