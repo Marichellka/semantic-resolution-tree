@@ -12,45 +12,57 @@ namespace Project
         {
             Head = item;
             ht = new Hashtable();
-            SymmetricalTraversal(Head);
-            Print(Head);
+            foreach (var code in Head.Childs)
+            {
+                Print(Head);
+                SymmetricalTraversal(code);
+                Console.WriteLine();
+            }
         }
-        public string SymmetricalTraversal(Tree tree)
+        public double SymmetricalTraversal(Tree tree)
         {
             ICollection keys = ht.Keys;
-            if (tree.Childs[0] != null && tree.Childs.Count != 0)
+            if (tree.Childs != null && tree.Childs.Count != 0)
             {
+                Print(Head);
+                Console.WriteLine();
                 double result = 0;
                 switch (tree.Key)
                 {
                     case "+":
-                        result = (double.Parse(SymmetricalTraversal(tree.Childs[0])) + double.Parse(SymmetricalTraversal(tree.Childs[1])));
+                        result = SymmetricalTraversal(tree.Childs[0]) + SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "-":
-                        result = (double.Parse(SymmetricalTraversal(tree.Childs[1])) - double.Parse(SymmetricalTraversal(tree.Childs[0])));
+                        result = SymmetricalTraversal(tree.Childs[1]) - SymmetricalTraversal(tree.Childs[0]);
                         break;
                     case "*":
-                        result = (double.Parse(SymmetricalTraversal(tree.Childs[0])) * double.Parse(SymmetricalTraversal(tree.Childs[1])));
+                        result = SymmetricalTraversal(tree.Childs[0]) * SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "/":
-                        result = (double.Parse(SymmetricalTraversal(tree.Childs[1])) / double.Parse(SymmetricalTraversal(tree.Childs[0])));
+                        result = SymmetricalTraversal(tree.Childs[1]) / SymmetricalTraversal(tree.Childs[0]);
                         break;
+                    case "=":
+                        if (ht.ContainsKey(tree.Childs[1].Key))
+                        {
+                            ht[tree.Childs[1].Key] = SymmetricalTraversal(tree.Childs[0]);
+                        }
+                        else
+                        {
+                            ht.Add(tree.Childs[1].Key, SymmetricalTraversal(tree.Childs[0]));
+                        }
+                        return 0;
                 }
                 tree.Key = result.ToString();
                 tree.Childs = new List<Tree>();
-            }
-            if (tree.Key.Equals("="))
-            {
-                ht.Add(tree.Childs[1].Key, SymmetricalTraversal(tree.Childs[0]));
             }
             foreach (string key in keys)
             {
                 if (tree.Key.Equals(key))
                 {
-                    return tree.Key = ht[key].ToString();
+                    return double.Parse(tree.Key = ht[key].ToString());
                 }
             }
-            return tree.Key;
+            return double.Parse(tree.Key);
         }
         public void Print(Tree tree)
         {
