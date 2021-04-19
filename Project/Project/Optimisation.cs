@@ -12,77 +12,78 @@ namespace Project
         {
             Head = item;
             ht = new Hashtable();
+            SymmetricalTraversal(Head);
+            Print(Head);
         }
-        public void BFS(int n = 0)
-        {
-            bool[] used = new bool[20];
-            used[n] = true;
-            Queue<Tree> queue = new Queue<Tree>();
-            queue.Enqueue(Head);
-            while (queue.Count != 0)
-            {
-                Tree item = queue.Dequeue();
-                if (item.Key.Contains("="))
-                {
-                    if (!item.Childs[1].Key.Equals("+") && !item.Childs[1].Key.Equals("-") && !item.Childs[1].Key.Equals("*") && !item.Childs[1].Key.Equals("/"))
-                    {
-                        ht.Add(item.Childs[0].Key, item.Childs[1].Key);
-                    }
-                }
-                for (int i = 0; i < item.Childs.Count; i++)
-                {
-                    if (item.Childs[i] != null && !used[n + i + 1])
-                    {
-                        used[n + i + 1] = true;
-                        queue.Enqueue(item.Childs[i]);
-                        n += i + 1;
-                    }
-                }
-                Action(item);
-            }
-        }
-        private void Action(Tree item)
+        public string SymmetricalTraversal(Tree tree)
         {
             ICollection keys = ht.Keys;
-            if (item.Key.Equals("+") || item.Key.Equals("-") || item.Key.Equals("*") || item.Key.Equals("/"))
+            if (tree.Childs[0] != null && tree.Childs.Count != 0)
             {
-                foreach (string key in keys)
+                double result = 0;
+                switch (tree.Key)
                 {
-                    if (item.Childs[0].Key.Contains(key))
+                    case "+":
+                        result = (double.Parse(SymmetricalTraversal(tree.Childs[0])) + double.Parse(SymmetricalTraversal(tree.Childs[1])));
+                        break;
+                    case "-":
+                        result = (double.Parse(SymmetricalTraversal(tree.Childs[1])) - double.Parse(SymmetricalTraversal(tree.Childs[0])));
+                        break;
+                    case "*":
+                        result = (double.Parse(SymmetricalTraversal(tree.Childs[0])) * double.Parse(SymmetricalTraversal(tree.Childs[1])));
+                        break;
+                    case "/":
+                        result = (double.Parse(SymmetricalTraversal(tree.Childs[1])) / double.Parse(SymmetricalTraversal(tree.Childs[0])));
+                        break;
+                }
+                tree.Key = result.ToString();
+                tree.Childs = new List<Tree>();
+            }
+            if (tree.Key.Equals("="))
+            {
+                ht.Add(tree.Childs[1].Key, SymmetricalTraversal(tree.Childs[0]));
+            }
+            foreach (string key in keys)
+            {
+                if (tree.Key.Equals(key))
+                {
+                    return tree.Key = ht[key].ToString();
+                }
+            }
+            return tree.Key;
+        }
+        public void Print(Tree tree)
+        {
+            if (tree == null) return;
+            for (int i = 0; i < tree.Childs.Count; i++)
+            {
+                if (i != tree.Childs.Count / 2)
+                {
+                    Console.Write("(");
+                    Print(tree.Childs[i]);
+                    Console.Write(")");
+                }
+                else
+                {
+                    Console.Write("(");
+                    Print(tree.Childs[i]);
+                    Console.Write(")");
+                    if (tree.Key != null)
+                        Console.Write(tree.Key);
+                    else
                     {
-                        /*item.Childs[0].Key.Replace(Convert.ToChar(key), Convert.ToChar(ht[key]));*/
-                        item.Childs[0].Key = ht[key].ToString();
-                    }
-                    if (item.Childs[1].Key.Contains(key))
-                    {
-                        /*item.Childs[1].Key.Replace(Convert.ToChar(key), Convert.ToChar(ht[key]));*/
-                        item.Childs[1].Key = ht[key].ToString();
+                        Console.Write("_");
                     }
                 }
-                double a = 0;
-                double b = 0;
-                if (Double.TryParse(item.Childs[0].Key, out a) && Double.TryParse(item.Childs[1].Key, out b))
+            }
+
+            if (tree.Childs.Count == 0)
+            {
+                if (tree.Key != null)
+                    Console.Write(tree.Key);
+                else
                 {
-                    switch (item.Key)
-                    {
-                        case "+":
-                            item = new Tree((a + b).ToString());
-                            break;
-                        case "-":
-                            item = new Tree((a - b).ToString());
-                            break;
-                        case "*":
-                            item = new Tree((a * b).ToString());
-                            break;
-                        case "/":
-                            item = new Tree((a / b).ToString());
-                            break;
-                    }
-                }
-                if (item.Parent.Key.Equals("+") || item.Parent.Key.Equals("-") || item.Parent.Key.Equals("*") || item.Parent.Key.Equals("/"))
-                {
-                    item = item.Parent;
-                    Action(item);
+                    Console.Write("_");
                 }
             }
         }
