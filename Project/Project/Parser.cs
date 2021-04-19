@@ -7,12 +7,12 @@ namespace Project
 {
     public class Parser
     {
-        private Tree AST;
+        public Tree AST { get; private set; }
         private List<string> tokens;
 
         public Parser(string path)
         {
-            AST = new Tree(null);
+            AST = new Tree(string.Empty);
             using (StreamReader reader = new StreamReader(path, Encoding.Default))
             {
                 while (!reader.EndOfStream)
@@ -33,7 +33,7 @@ namespace Project
                 AST = AST.Childs[AST.Childs.Count-1];
                 PolishNotation(code.Substring(code.IndexOf("if")+2));
                 AST.Insert(BuildCurrentTree());
-                AST.Insert(new Tree(null));
+                AST.Insert(new Tree(string.Empty));
                 AST = AST.Childs[AST.Childs.Count-1];
             }
             else if(code=="else")
@@ -133,7 +133,7 @@ namespace Project
 
         private Tree BuildCurrentTree()
         {
-            Tree currentTree =new Tree(null);
+            Tree currentTree =new Tree(string.Empty);
             Tree currentNode = currentTree;
             for(int i=tokens.Count-1; i>=0; i--)
             {
@@ -155,9 +155,9 @@ namespace Project
                 }
                 else
                 {
-                    if (currentNode.Key!=null)
+                    if (!currentNode.Key.Equals(string.Empty))
                     {
-                        currentNode.Insert(new Tree(null));
+                        currentNode.Insert(new Tree(string.Empty));
                         currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
                     }
                     currentNode.Key = tokens[i];
