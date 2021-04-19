@@ -38,6 +38,52 @@ namespace Project
                         n += i + 1;
                     }
                 }
+                Action(item);
+            }
+        }
+        private void Action(Tree item)
+        {
+            ICollection keys = ht.Keys;
+            if (item.Key.Equals("+") || item.Key.Equals("-") || item.Key.Equals("*") || item.Key.Equals("/"))
+            {
+                foreach (string key in keys)
+                {
+                    if (item.Childs[0].Key.Contains(key))
+                    {
+                        /*item.Childs[0].Key.Replace(Convert.ToChar(key), Convert.ToChar(ht[key]));*/
+                        item.Childs[0].Key = ht[key].ToString();
+                    }
+                    if (item.Childs[1].Key.Contains(key))
+                    {
+                        /*item.Childs[1].Key.Replace(Convert.ToChar(key), Convert.ToChar(ht[key]));*/
+                        item.Childs[1].Key = ht[key].ToString();
+                    }
+                }
+                double a = 0;
+                double b = 0;
+                if (Double.TryParse(item.Childs[0].Key, out a) && Double.TryParse(item.Childs[1].Key, out b))
+                {
+                    switch (item.Key)
+                    {
+                        case "+":
+                            item = new Tree((a + b).ToString());
+                            break;
+                        case "-":
+                            item = new Tree((a - b).ToString());
+                            break;
+                        case "*":
+                            item = new Tree((a * b).ToString());
+                            break;
+                        case "/":
+                            item = new Tree((a / b).ToString());
+                            break;
+                    }
+                }
+                if (item.Parent.Key.Equals("+") || item.Parent.Key.Equals("-") || item.Parent.Key.Equals("*") || item.Parent.Key.Equals("/"))
+                {
+                    item = item.Parent;
+                    Action(item);
+                }
             }
         }
     }
