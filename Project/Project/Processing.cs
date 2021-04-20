@@ -6,29 +6,46 @@ namespace Project
 {
     public class Processing
     {
-        private Tree Head;
+        public Tree Head { get; }
         public Hashtable ht { get; private set; }
         public Processing(Tree item)
         {
             Head = item;
             ht = new Hashtable();
-            Optimisation();
+            Print(item);
+            Console.WriteLine();
         }
 
         public void ProcessingTree(Tree item)
         {
-            foreach (var code in item.Childs)
+            Print(item);
+            Console.WriteLine();
+            foreach (var subtree in item.Childs)
             {
+                if (subtree.Key.Equals("if"))
+                {
+                    if (IfCondition(subtree))
+                    {
+                        ProcessingTree(subtree.Childs[1]);
+                    }
+                    else if (subtree.Childs.Count > 2)
+                    {
+                        ProcessingTree(subtree.Childs[2]);
+                    }
+                }
+                else
+                {
+                    SymmetricalTraversal(subtree);
+                }
                 Print(item);
-                SymmetricalTraversal(code);
                 Console.WriteLine();
             }
         }
 
-        private void Optimisation()
+        public void Optimisation()
         {
             int n = 0;
-            bool[] used = new bool[20];
+            bool[] used = new bool[100];
             used[n] = true;
             Queue<Tree> queue = new Queue<Tree>();
             queue.Enqueue(Head);
@@ -45,13 +62,17 @@ namespace Project
                     item.Key = "0";
                     item.Childs = null;
                 }
-                for (int i = 0; i < item.Childs.Count; i++)
+
+                if (item.Childs != null)
                 {
-                    if (item.Childs[i] != null && !used[n + i + 1])
+                    for (int i = 0; i < item.Childs.Count; i++)
                     {
-                        used[n + i + 1] = true;
-                        queue.Enqueue(item.Childs[i]);
-                        n += i + 1;
+                        if (item.Childs[i] != null && !used[n + i + 1])
+                        {
+                            used[n + i + 1] = true;
+                            queue.Enqueue(item.Childs[i]);
+                            n += i + 1;
+                        }
                     }
                 }
             }
@@ -103,10 +124,10 @@ namespace Project
             return double.Parse(tree.Key);
         }
 
-        private bool IfBranch(Tree item)
+        private bool IfCondition(Tree item)
         {
-            double a = SymmetricalTraversal(item.Childs[0].Childs[0]);
-            double b = SymmetricalTraversal((item.Childs[0].Childs[1]));
+            double a = SymmetricalTraversal(item.Childs[0].Childs[1]);
+            double b = SymmetricalTraversal((item.Childs[0].Childs[0]));
             switch (item.Childs[0].Key)
             {
                 case "<":
@@ -133,6 +154,16 @@ namespace Project
         public void Print(Tree tree)
         {
             if (tree == null) return;
+            if (tree.Childs == null || tree.Childs.Count == 0)
+            {
+                if (tree.Key != null)
+                    Console.Write(tree.Key);
+                else
+                {
+                    Console.Write("_");
+                }
+                return;
+            }
             for (int i = 0; i < tree.Childs.Count; i++)
             {
                 if (i != tree.Childs.Count / 2)
@@ -152,16 +183,6 @@ namespace Project
                     {
                         Console.Write("_");
                     }
-                }
-            }
-
-            if (tree.Childs.Count == 0)
-            {
-                if (tree.Key != null)
-                    Console.Write(tree.Key);
-                else
-                {
-                    Console.Write("_");
                 }
             }
         }

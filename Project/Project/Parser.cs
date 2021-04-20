@@ -82,9 +82,9 @@ namespace Project
                 {
                     while (stack.Peek()!='(')
                     {
-                        if ("=><!".Contains(stack.Peek()) && tokens[tokens.Count - 1] == "=")
+                        if ("=><!".Contains(stack.Peek()) && "=><!".Contains(tokens[tokens.Count - 1]))
                         {
-                            tokens[tokens.Count - 1] += stack.Pop();
+                            tokens[tokens.Count - 1] = stack.Pop()+ tokens[tokens.Count - 1] ;
                         }
                         else
                         {
