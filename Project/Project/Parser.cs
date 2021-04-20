@@ -23,7 +23,7 @@ namespace Project
             }
         }
         
-        private void ParsingString(StreamReader reader)
+         private void ParsingString(StreamReader reader)
         {
             string code = reader.ReadLine().Replace(" ", "");
             code.Replace("	", "");
@@ -60,7 +60,7 @@ namespace Project
             switch (oper)
             {
                 case '(':
-                    return 0;
+                    return -1;
                 case ')':
                     return 1;
                 case char when "+-".Contains(oper):
@@ -68,7 +68,7 @@ namespace Project
                 case char when "*/".Contains(oper):
                     return 3;
                 case char when "=><!".Contains(oper):
-                    return -1;
+                    return 0;
             }
 
             return 0;
@@ -107,11 +107,11 @@ namespace Project
                     i--;
                     tokens.Add(elem);
                 }
-                else if ("(!=<>".Contains(code[i]))
+                else if ("(".Contains(code[i]))
                 {
                     stack.Push(code[i]);
                 }
-                else if(code[i]=='+'||code[i]=='-'||code[i]=='/'||code[i]=='*')
+                else if("+-*/!=<>".Contains(code[i]))
                 {
                     if(stack.Count==0)
                         stack.Push(code[i]);
@@ -123,7 +123,13 @@ namespace Project
                             tokens.Add(stack.Pop().ToString());
                         
                         stack.Push(code[i]);           
-                    } 
+                    }
+
+                    if (code[i + 1] == '=')
+                    {
+                        stack.Push(code[i+1]);
+                        i++;
+                    }
                 }
             }
             foreach (var elem in stack)
