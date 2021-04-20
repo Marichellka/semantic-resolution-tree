@@ -12,14 +12,19 @@ namespace Project
         {
             Head = item;
             ht = new Hashtable();
-            foreach (var code in Head.Childs)
+        }
+
+        public void Processing(Tree item)
+        {
+            foreach (var code in item.Childs)
             {
-                Print(Head);
+                Print(item);
                 SymmetricalTraversal(code);
                 Console.WriteLine();
             }
         }
-        public double SymmetricalTraversal(Tree tree)
+        
+        private double SymmetricalTraversal(Tree tree)
         {
             ICollection keys = ht.Keys;
             if (tree.Childs != null && tree.Childs.Count != 0)
@@ -63,6 +68,34 @@ namespace Project
                 }
             }
             return double.Parse(tree.Key);
+        }
+
+        private bool IfBranch(Tree item)
+        {
+            double a = SymmetricalTraversal(item.Childs[0].Childs[0]);
+            double b = SymmetricalTraversal((item.Childs[0].Childs[1]));
+            switch (item.Childs[0].Key)
+            {
+                case "<":
+                    if (a < b) return true;
+                    return false;
+                case "<=":
+                    if (a <= b) return true;
+                    return false;
+                case ">":
+                    if (a > b) return true;
+                    return false;
+                case ">=":
+                    if (a >= b) return true;
+                    return false;
+                case "==":
+                    if (a == b) return true;
+                    return false;
+                case "!=":
+                    if (a != b) return true;
+                    return false;
+            }
+            return false;
         }
         public void Print(Tree tree)
         {
