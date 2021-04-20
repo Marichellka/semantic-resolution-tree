@@ -4,23 +4,20 @@ namespace Project
 {
     public class Tree
     {
-        public Tree Parent { get; private set; }
-        public Tree Node{get;}
-        public object Key { get; set; }
-        public List<Tree> Childs { get;}
+        public Tree Parent { get; set; }
+        public string Key { get; set; }
+        public List<Tree> Childs { get; set; } 
 
-        public Tree(object value)
+        public Tree(string value)
         {
             Key = value;
             Childs= new List<Tree>();
             Parent = null;
-            Node = this;
         }
 
-        public void Insert(object value)
+        public void Insert(Tree newNode)
         {
-            Tree newNode = new Tree(value);
-            newNode.Parent = Node;
+            newNode.Parent = this;
             Childs.Add(newNode);
         }
     }
