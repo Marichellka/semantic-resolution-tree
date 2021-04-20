@@ -6,7 +6,7 @@ namespace Project
     {
         public Tree Parent { get; set; }
         public string Key { get; set; }
-        public List<Tree> Childs { get; } 
+        public List<Tree> Childs { get; set; } 
 
         public Tree(string value)
         {

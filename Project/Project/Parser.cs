@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Channels;
 
 namespace Project
 {
     public class Parser
     {
-        private Tree AST;
+        public Tree AST { get; private set; }
         private List<string> tokens;
 
         public Parser(string path)
         {
-            AST = new Tree(null);
+            AST = new Tree(string.Empty);
             using (StreamReader reader = new StreamReader(path, Encoding.Default))
             {
                 while (!reader.EndOfStream)
@@ -22,7 +23,7 @@ namespace Project
             }
         }
         
-        private void ParsingString(StreamReader reader)
+         private void ParsingString(StreamReader reader)
         {
             string code = reader.ReadLine().Replace(" ", "");
             code.Replace("	", "");
@@ -33,7 +34,7 @@ namespace Project
                 AST = AST.Childs[AST.Childs.Count-1];
                 PolishNotation(code.Substring(code.IndexOf("if")+2));
                 AST.Insert(BuildCurrentTree());
-                AST.Insert(new Tree(null));
+                AST.Insert(new Tree(string.Empty));
                 AST = AST.Childs[AST.Childs.Count-1];
             }
             else if(code=="else")
@@ -59,7 +60,7 @@ namespace Project
             switch (oper)
             {
                 case '(':
-                    return 0;
+                    return -1;
                 case ')':
                     return 1;
                 case char when "+-".Contains(oper):
@@ -67,7 +68,7 @@ namespace Project
                 case char when "*/".Contains(oper):
                     return 3;
                 case char when "=><!".Contains(oper):
-                    return -1;
+                    return 0;
             }
 
             return 0;
@@ -82,9 +83,9 @@ namespace Project
                 {
                     while (stack.Peek()!='(')
                     {
-                        if ("=><!".Contains(stack.Peek()) && tokens[tokens.Count - 1] == "=")
+                        if ("=><!".Contains(stack.Peek()) && "=><!".Contains(tokens[tokens.Count - 1]))
                         {
-                            tokens[tokens.Count - 1] += stack.Pop();
+                            tokens[tokens.Count - 1] = stack.Pop()+ tokens[tokens.Count - 1] ;
                         }
                         else
                         {
@@ -106,11 +107,11 @@ namespace Project
                     i--;
                     tokens.Add(elem);
                 }
-                else if ("(!=<>".Contains(code[i]))
+                else if ("(".Contains(code[i]))
                 {
                     stack.Push(code[i]);
                 }
-                else if(code[i]=='+'||code[i]=='-'||code[i]=='/'||code[i]=='*')
+                else if("+-*/!=<>".Contains(code[i]))
                 {
                     if(stack.Count==0)
                         stack.Push(code[i]);
@@ -122,7 +123,13 @@ namespace Project
                             tokens.Add(stack.Pop().ToString());
                         
                         stack.Push(code[i]);           
-                    } 
+                    }
+
+                    if (code[i + 1] == '=')
+                    {
+                        stack.Push(code[i+1]);
+                        i++;
+                    }
                 }
             }
             foreach (var elem in stack)
@@ -133,31 +140,24 @@ namespace Project
 
         private Tree BuildCurrentTree()
         {
-            Tree currentTree =new Tree(null);
+            Tree currentTree =new Tree(string.Empty);
             Tree currentNode = currentTree;
             for(int i=tokens.Count-1; i>=0; i--)
             {
+                while (currentNode.Childs.Count==2)
+                {
+                    currentNode = currentNode.Parent;
+                }
                 if (double.TryParse(tokens[i], out _) || Char.IsLetter(tokens[i][0]))
                 {
-                    if (currentNode.Childs.Count <  2)
-                    {
+                    
                         currentNode.Insert(new Tree(tokens[i]));
-                    }
-                    else
-                    {
-                        currentNode = currentNode.Parent;
-                        while (currentNode.Childs.Count==2)
-                        {
-                            currentNode = currentNode.Parent;
-                        }
-                        currentNode.Insert(new Tree(tokens[i]));
-                    }
                 }
                 else
                 {
-                    if (currentNode.Key!=null)
+                    if (!currentNode.Key.Equals(string.Empty))
                     {
-                        currentNode.Insert(new Tree(null));
+                        currentNode.Insert(new Tree(string.Empty));
                         currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
                     }
                     currentNode.Key = tokens[i];
