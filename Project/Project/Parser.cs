@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Channels;
 
 namespace Project
 {
@@ -137,21 +138,14 @@ namespace Project
             Tree currentNode = currentTree;
             for(int i=tokens.Count-1; i>=0; i--)
             {
+                while (currentNode.Childs.Count==2)
+                {
+                    currentNode = currentNode.Parent;
+                }
                 if (double.TryParse(tokens[i], out _) || Char.IsLetter(tokens[i][0]))
                 {
-                    if (currentNode.Childs.Count <  2)
-                    {
+                    
                         currentNode.Insert(new Tree(tokens[i]));
-                    }
-                    else
-                    {
-                        currentNode = currentNode.Parent;
-                        while (currentNode.Childs.Count==2)
-                        {
-                            currentNode = currentNode.Parent;
-                        }
-                        currentNode.Insert(new Tree(tokens[i]));
-                    }
                 }
                 else
                 {
