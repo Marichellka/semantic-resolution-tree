@@ -8,7 +8,7 @@ namespace Project
         static void Main(string[] args)
         {
             Parser parcer = new Parser(Path.Combine(Environment.CurrentDirectory, @"info.txt"));
-            Optimisation o = new Optimisation(parcer.AST);
+            Processing o = new Processing(parcer.AST);
         }
     }
 }

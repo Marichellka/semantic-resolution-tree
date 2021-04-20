@@ -4,23 +4,56 @@ using System.Collections;
 
 namespace Project
 {
-    public class Optimisation
+    public class Processing
     {
         private Tree Head;
         public Hashtable ht { get; private set; }
-        public Optimisation(Tree item)
+        public Processing(Tree item)
         {
             Head = item;
             ht = new Hashtable();
+            Optimisation();
         }
 
-        public void Processing(Tree item)
+        public void ProcessingTree(Tree item)
         {
             foreach (var code in item.Childs)
             {
                 Print(item);
                 SymmetricalTraversal(code);
                 Console.WriteLine();
+            }
+        }
+
+        private void Optimisation()
+        {
+            int n = 0;
+            bool[] used = new bool[20];
+            used[n] = true;
+            Queue<Tree> queue = new Queue<Tree>();
+            queue.Enqueue(Head);
+            while (queue.Count != 0)
+            {
+                Tree item = queue.Dequeue();
+                if (item.Key.Equals("*") && (item.Childs[0].Key.Equals("0") || item.Childs[1].Key.Equals("0")))
+                {
+                    item.Key = "0";
+                    item.Childs = null;
+                }
+                else if (item.Key.Equals("/") && item.Childs[1].Key.Equals("0"))
+                {
+                    item.Key = "0";
+                    item.Childs = null;
+                }
+                for (int i = 0; i < item.Childs.Count; i++)
+                {
+                    if (item.Childs[i] != null && !used[n + i + 1])
+                    {
+                        used[n + i + 1] = true;
+                        queue.Enqueue(item.Childs[i]);
+                        n += i + 1;
+                    }
+                }
             }
         }
         
