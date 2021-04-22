@@ -51,7 +51,7 @@ namespace Project
                     item.Key = "0";
                     item.Childs = null;
                 }
-                else if (item.Key.Equals("/") && item.Childs[1].Key.Equals("0"))
+                else if (item.Key.Equals("/") && item.Childs[0].Key.Equals("0"))
                 {
                     item.Key = "0";
                     item.Childs = null;
@@ -84,22 +84,22 @@ namespace Project
                         result = SymmetricalTraversal(tree.Childs[0]) + SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "-":
-                        result = SymmetricalTraversal(tree.Childs[1]) - SymmetricalTraversal(tree.Childs[0]);
+                        result =SymmetricalTraversal(tree.Childs[0]) - SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "*":
                         result = SymmetricalTraversal(tree.Childs[0]) * SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "/":
-                        result = SymmetricalTraversal(tree.Childs[1]) / SymmetricalTraversal(tree.Childs[0]);
+                        result =SymmetricalTraversal(tree.Childs[0]) / SymmetricalTraversal(tree.Childs[1]);
                         break;
                     case "=":
-                        if (ht.ContainsKey(tree.Childs[1].Key))
+                        if (ht.ContainsKey(tree.Childs[0].Key))
                         {
-                            ht[tree.Childs[1].Key] = SymmetricalTraversal(tree.Childs[0]);
+                            ht[tree.Childs[0].Key] = SymmetricalTraversal(tree.Childs[1]);
                         }
                         else
                         {
-                            ht.Add(tree.Childs[1].Key, SymmetricalTraversal(tree.Childs[0]));
+                            ht.Add(tree.Childs[0].Key, SymmetricalTraversal(tree.Childs[1]));
                         }
                         return 0;
                 }
@@ -118,8 +118,8 @@ namespace Project
 
         private bool IfCondition(Tree item)
         {
-            double a = SymmetricalTraversal(item.Childs[0].Childs[1]);
-            double b = SymmetricalTraversal((item.Childs[0].Childs[0]));
+            double a = SymmetricalTraversal(item.Childs[0].Childs[0]);
+            double b = SymmetricalTraversal((item.Childs[0].Childs[1]));
             switch (item.Childs[0].Key)
             {
                 case "<":
