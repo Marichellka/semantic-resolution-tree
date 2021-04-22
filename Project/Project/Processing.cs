@@ -7,19 +7,15 @@ namespace Project
     public class Processing
     {
         public Tree Head { get; }
-        public Hashtable ht { get; private set; }
+        public Hashtable ht { get;}
         public Processing(Tree item)
         {
             Head = item;
             ht = new Hashtable();
-            Print(item);
-            Console.WriteLine();
         }
 
         public void ProcessingTree(Tree item)
         {
-            Print(item);
-            Console.WriteLine();
             foreach (var subtree in item.Childs)
             {
                 if (subtree.Key.Equals("if"))
@@ -37,8 +33,6 @@ namespace Project
                 {
                     SymmetricalTraversal(subtree);
                 }
-                Print(item);
-                Console.WriteLine();
             }
         }
 
@@ -83,8 +77,6 @@ namespace Project
             ICollection keys = ht.Keys;
             if (tree.Childs != null && tree.Childs.Count != 0)
             {
-                Print(Head);
-                Console.WriteLine();
                 double result = 0;
                 switch (tree.Key)
                 {
@@ -150,41 +142,6 @@ namespace Project
                     return false;
             }
             return false;
-        }
-        public void Print(Tree tree)
-        {
-            if (tree == null) return;
-            if (tree.Childs == null || tree.Childs.Count == 0)
-            {
-                if (tree.Key != null)
-                    Console.Write(tree.Key);
-                else
-                {
-                    Console.Write("_");
-                }
-                return;
-            }
-            for (int i = 0; i < tree.Childs.Count; i++)
-            {
-                if (i != tree.Childs.Count / 2)
-                {
-                    Console.Write("(");
-                    Print(tree.Childs[i]);
-                    Console.Write(")");
-                }
-                else
-                {
-                    Console.Write("(");
-                    Print(tree.Childs[i]);
-                    Console.Write(")");
-                    if (tree.Key != null)
-                        Console.Write(tree.Key);
-                    else
-                    {
-                        Console.Write("_");
-                    }
-                }
-            }
         }
     }
 }

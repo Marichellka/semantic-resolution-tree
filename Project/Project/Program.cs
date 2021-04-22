@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+using System;
 
 namespace Project
 {
@@ -7,7 +6,7 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            Parser parsing = new Parser(Path.Combine(Environment.CurrentDirectory, @"info.txt"));
+            Parser parsing = new Parser( @"info.txt");
             Processing process = new Processing(parsing.AST);
             process.Optimisation();
             process.ProcessingTree(process.Head);
