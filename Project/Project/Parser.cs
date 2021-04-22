@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Channels;
 
 namespace Project
 {
     public class Parser
     {
         public Tree AST { get; private set; }
-        private List<string> tokens;
 
         public Parser(string path)
         {
@@ -27,13 +25,11 @@ namespace Project
         {
             string code = reader.ReadLine().Replace(" ", "");
             code.Replace("	", "");
-            tokens = new List<string>();
             if (code.Length > 4 && code.Contains("if("))
             {
                 AST.Insert(new Tree("if"));
                 AST = AST.Childs[AST.Childs.Count-1];
-                PolishNotation(code.Substring(code.IndexOf("if")+2));
-                AST.Insert(BuildCurrentTree());
+                AST.Insert(ShuntingYard(code.Substring(code.IndexOf("if")+2)));
                 AST.Insert(new Tree(string.Empty));
                 AST = AST.Childs[AST.Childs.Count-1];
             }
@@ -45,14 +41,79 @@ namespace Project
             }
             else if (code=="endif")
             {
-                AST = AST.Parent;
-                AST = AST.Parent;
+                AST = AST.Parent.Parent;
             }
             else
             {
-                PolishNotation(code);
-                AST.Insert(BuildCurrentTree());
+                AST.Insert(ShuntingYard(code));
             }
+        }
+         
+        private Tree ShuntingYard(string expression)
+        {
+            Stack<char> operStack = new Stack<char>();
+            Stack<Tree> exprStack = new Stack<Tree>();
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (expression[i] == ')')
+                {
+                    while (operStack.Peek()!='(')
+                    {
+                        if ("=><!".Contains(operStack.Peek()) && "=><!".Contains(exprStack.Peek().Key))
+                        {
+                            exprStack.Peek().Key += operStack.Pop();
+                        }
+                        else
+                        {
+                            char operat = operStack.Pop();
+                            Tree rightChild = exprStack.Pop();
+                            Tree leftChild = exprStack.Pop();
+                            exprStack.Push(new Tree(operat.ToString(), leftChild, rightChild));
+                        }
+                    }
+                    operStack.Pop();
+                }
+                else if (Char.IsLetter(expression[i])||Char.IsDigit(expression[i]) || (expression[i]=='-' && (i==0 || expression[i-1]=='(')))
+                {
+                    string elem = expression[i].ToString();
+                    i++;
+                    while (i<expression.Length && (Char.IsLetter(expression[i]) || Char.IsDigit(expression[i]) || expression[i]=='.'))
+                    {
+                        elem += expression[i];
+                        i++;
+                    }
+                    i--;
+                    exprStack.Push(new Tree(elem));
+                }
+                else if (expression[i] == '(')
+                {
+                    operStack.Push(expression[i]);
+                }
+                else if("+-*/!=<>".Contains(expression[i]))
+                {
+                    while (operStack.Count != 0 && GetPriority(operStack.Peek()) >= GetPriority(expression[i]))
+                    {
+                        if (operStack.Peek() == '=' && expression[i] == '=')
+                        {
+                            break;
+                        }
+                        char operat = operStack.Pop();
+                        Tree rightChild = exprStack.Pop();
+                        Tree leftChild = exprStack.Pop();
+                        exprStack.Push(new Tree(operat.ToString(), leftChild, rightChild));
+                    }
+                    operStack.Push(expression[i]);
+                }
+            }
+
+            while (operStack.Count != 0)
+            {
+                char operat = operStack.Pop();
+                Tree rightChild = exprStack.Pop();
+                Tree leftChild = exprStack.Pop();
+                exprStack.Push(new Tree(operat.ToString(), leftChild, rightChild));
+            }
+            return exprStack.Pop();
         }
 
         private int GetPriority(char oper)
@@ -60,110 +121,20 @@ namespace Project
             switch (oper)
             {
                 case '(':
-                    return -1;
+                    return -2;
                 case ')':
                     return 1;
                 case char when "+-".Contains(oper):
                     return 2;
                 case char when "*/".Contains(oper):
                     return 3;
-                case char when "=><!".Contains(oper):
+                case char when "><!".Contains(oper):
+                    return -1;
+                case '=':
                     return 0;
             }
 
             return 0;
-        }
-        
-        private void PolishNotation(string code)
-        {
-            Stack<char> stack = new Stack<char>();
-            for (int i = 0; i < code.Length; i++)
-            {
-                if (code[i] == ')')
-                {
-                    while (stack.Peek()!='(')
-                    {
-                        if ("=><!".Contains(stack.Peek()) && "=><!".Contains(tokens[tokens.Count - 1]))
-                        {
-                            tokens[tokens.Count - 1] = stack.Pop()+ tokens[tokens.Count - 1] ;
-                        }
-                        else
-                        {
-                            tokens.Add(stack.Pop().ToString());
-                        }
-                    }
-                    stack.Pop();
-                }
-                else if (Char.IsLetter(code[i])||Char.IsDigit(code[i]))
-                {
-                    string elem = "";
-                    while (i<code.Length && (Char.IsLetter(code[i]) || Char.IsDigit(code[i]) || code[i]=='.'))
-                    {
-                        
-                        elem += code[i];
-                        i++;
-                    }
-
-                    i--;
-                    tokens.Add(elem);
-                }
-                else if ("(".Contains(code[i]))
-                {
-                    stack.Push(code[i]);
-                }
-                else if("+-*/!=<>".Contains(code[i]))
-                {
-                    if(stack.Count==0)
-                        stack.Push(code[i]);
-                    else if(GetPriority(stack.Peek())<GetPriority(code[i]))      
-                        stack.Push(code[i]);
-                    else                              
-                    {
-                        while(stack.Count!=0 && GetPriority(stack.Peek())>=GetPriority(code[i]))
-                            tokens.Add(stack.Pop().ToString());
-                        
-                        stack.Push(code[i]);           
-                    }
-
-                    if (code[i + 1] == '=')
-                    {
-                        stack.Push(code[i+1]);
-                        i++;
-                    }
-                }
-            }
-            foreach (var elem in stack)
-            {
-                tokens.Add(elem.ToString());
-            }
-        }
-
-        private Tree BuildCurrentTree()
-        {
-            Tree currentTree =new Tree(string.Empty);
-            Tree currentNode = currentTree;
-            for(int i=tokens.Count-1; i>=0; i--)
-            {
-                while (currentNode.Childs.Count==2)
-                {
-                    currentNode = currentNode.Parent;
-                }
-                if (double.TryParse(tokens[i], out _) || Char.IsLetter(tokens[i][0]))
-                {
-                    
-                        currentNode.Insert(new Tree(tokens[i]));
-                }
-                else
-                {
-                    if (!currentNode.Key.Equals(string.Empty))
-                    {
-                        currentNode.Insert(new Tree(string.Empty));
-                        currentNode = currentNode.Childs[currentNode.Childs.Count - 1];
-                    }
-                    currentNode.Key = tokens[i];
-                }
-            }
-            return currentTree;
         }
     }
 }

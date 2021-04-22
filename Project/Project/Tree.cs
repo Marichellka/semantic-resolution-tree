@@ -14,6 +14,14 @@ namespace Project
             Childs= new List<Tree>();
             Parent = null;
         }
+        
+        public Tree(string value, Tree leftChild, Tree rightChild)
+        {
+            Key = value;
+            Childs = new List<Tree>();
+            Childs.Add(leftChild);
+            Childs.Add(rightChild);
+        }
 
         public void Insert(Tree newNode)
         {
