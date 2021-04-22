@@ -73,9 +73,10 @@ namespace Project
                     }
                     operStack.Pop();
                 }
-                else if (Char.IsLetter(expression[i])||Char.IsDigit(expression[i]))
+                else if (Char.IsLetter(expression[i])||Char.IsDigit(expression[i]) || (expression[i]=='-' && (i==0 || expression[i-1]=='(')))
                 {
-                    string elem = "";
+                    string elem = expression[i].ToString();
+                    i++;
                     while (i<expression.Length && (Char.IsLetter(expression[i]) || Char.IsDigit(expression[i]) || expression[i]=='.'))
                     {
                         elem += expression[i];
