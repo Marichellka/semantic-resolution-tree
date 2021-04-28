@@ -39,7 +39,19 @@ namespace Project
                 AST.Insert(new Tree("else"));
                 AST=AST.Childs[AST.Childs.Count-1];
             }
+            else if (code.Contains("while("))
+            {
+                AST.Insert(new Tree("while"));
+                AST = AST.Childs[AST.Childs.Count-1];
+                AST.Insert(ShuntingYard(code.Substring(code.IndexOf("if")+2)));
+                AST.Insert(new Tree(string.Empty));
+                AST = AST.Childs[AST.Childs.Count-1];
+            }
             else if (code=="endif")
+            {
+                AST = AST.Parent.Parent;
+            }
+            else if (code == "endwhile")
             {
                 AST = AST.Parent.Parent;
             }
