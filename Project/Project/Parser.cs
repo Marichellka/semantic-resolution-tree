@@ -43,7 +43,7 @@ namespace Project
             {
                 AST.Insert(new Tree("while"));
                 AST = AST.Childs[AST.Childs.Count-1];
-                AST.Insert(ShuntingYard(code.Substring(code.IndexOf("if")+2)));
+                AST.Insert(ShuntingYard(code.Substring(code.IndexOf("while")+5)));
                 AST.Insert(new Tree(string.Empty));
                 AST = AST.Childs[AST.Childs.Count-1];
             }

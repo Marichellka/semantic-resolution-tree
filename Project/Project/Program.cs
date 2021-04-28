@@ -6,11 +6,11 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            Parser parsing = new Parser( @"info.txt");
+            Parser parsing = new Parser( @"C:\Users\user\Desktop\Навчання\ОП\2 семестр\info.txt");
             Processing process = new Processing(parsing.AST);
             process.Optimisation();
             process.ProcessingTree(process.Head);
-            Console.WriteLine("result="+process.Head.Childs[process.Head.Childs.Count-1].Key);
+            Console.WriteLine("result="+process.Result());
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Project
                     }
                 }
                 else if (subtree.Key.Equals("while"))
-                { 
+                {
                     while (Condition(subtree))
                     {
                         ProcessingTree(subtree.Childs[1]);
@@ -78,11 +78,16 @@ namespace Project
                 }
             }
         }
+
+        public double Result()
+        {
+            return SymmetricalTraversal(Head.Childs[Head.Childs.Count - 1]);
+        }
         
         private double SymmetricalTraversal(Tree tree)
         {
             ICollection keys = ht.Keys;
-            if (tree.Childs != null && tree.Childs.Count != 0)
+            if (!Char.IsLetter(tree.Key[0]) && !Char.IsDigit(tree.Key[0]))
             {
                 double result = 0;
                 switch (tree.Key)
@@ -108,16 +113,16 @@ namespace Project
                         {
                             ht.Add(tree.Childs[0].Key, SymmetricalTraversal(tree.Childs[1]));
                         }
-                        return 0;
+                        break;
                 }
-                tree.Key = result.ToString();
-                tree.Childs = new List<Tree>();
+
+                return result;
             }
             foreach (string key in keys)
             {
                 if (tree.Key.Equals(key))
                 {
-                    return double.Parse(tree.Key = ht[key].ToString());
+                    return double.Parse(ht[key].ToString());
                 }
             }
             return double.Parse(tree.Key);
