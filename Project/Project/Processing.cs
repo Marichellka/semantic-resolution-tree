@@ -20,13 +20,20 @@ namespace Project
             {
                 if (subtree.Key.Equals("if"))
                 {
-                    if (IfCondition(subtree))
+                    if (Condition(subtree))
                     {
                         ProcessingTree(subtree.Childs[1]);
                     }
                     else if (subtree.Childs.Count > 2)
                     {
                         ProcessingTree(subtree.Childs[2]);
+                    }
+                }
+                else if (subtree.Key.Equals("while"))
+                { 
+                    while (Condition(subtree))
+                    {
+                        ProcessingTree(subtree.Childs[1]);
                     }
                 }
                 else
@@ -116,7 +123,7 @@ namespace Project
             return double.Parse(tree.Key);
         }
 
-        private bool IfCondition(Tree item)
+        private bool Condition(Tree item)
         {
             double a = SymmetricalTraversal(item.Childs[0].Childs[0]);
             double b = SymmetricalTraversal((item.Childs[0].Childs[1]));
